@@ -1,13 +1,11 @@
-# 📝 LOGBOOK PENGEMBANGAN APLIKASI WEB (AI INTERACTION LOG)
+#  LOGBOOK PENGEMBANGAN APLIKASI WEB 
 
 **Nama Proyek:** Portal Belajar SMA & Smart Study Task Manager  
-**Pengembang:** Siswa / Tim Pengembang  
-**Teknologi:** HTML5, CSS3, JavaScript (ES6), LocalStorage, PWA (Service Worker)  
 **Tanggal:** 29 Oktober 2026  
 
 ---
 
-## 📌 TAHAP 1: Eksplorasi Ide & Perancangan Solusi
+##  TAHAP 1: Eksplorasi Ide & Perancangan Solusi
 > **Fokus:** Menentukan konsep produk, arsitektur visual, serta penggabungan dua ide modul aplikasi (Portal Belajar SMA + Smart Study Task Manager).
 
 | No | Prompt / Interaksi dengan AI | Saran / Output dari AI | Validasi & Modifikasi Mandiri (Oleh Siswa) |
@@ -17,7 +15,7 @@
 
 ---
 
-## 📌 TAHAP 2: Penyusunan Kerangka Kode (Scaffolding)
+## TAHAP 2: Penyusunan Kerangka Kode (Scaffolding)
 > **Fokus:** Menyusun struktur dasar HTML, penggabungan styling CSS, dan fungsi utama logika JavaScript.
 
 | No | Prompt / Interaksi dengan AI | Saran / Output dari AI | Validasi & Modifikasi Mandiri (Oleh Siswa) |
@@ -28,7 +26,7 @@
 
 ---
 
-## 📌 TAHAP 3: Pemecahan Masalah & Penanganan Galat (Debugging)
+## TAHAP 3: Pemecahan Masalah & Penanganan Galat (Debugging)
 > **Fokus:** Memperbaiki *bug*, menangani galat pada LocalStorage, dan sinkronisasi data antar modul.
 
 | No | Prompt / Interaksi dengan AI | Saran / Output dari AI | Validasi & Modifikasi Mandiri (Oleh Siswa) |
@@ -39,7 +37,7 @@
 
 ---
 
-## 📌 TAHAP 4: Refleksi & Penjelasan Kode
+## TAHAP 4: Refleksi & Penjelasan Kode
 > **Fokus:** Verifikasi pemahaman siswa terhadap fungsi program, tipe data yang digunakan, dan arsitektur aplikasi.
 
 | No | Topik Pembahasan / Pertanyaan | Penjelasan & Pemahaman Siswa | Analisis & Validasi Penerapan Kode |
@@ -50,5 +48,5 @@
 
 ---
 
-### 🎓 Ringkasan Pembelajaran & Kesimpulan:
+###  Ringkasan Pembelajaran & Kesimpulan:
 Penggunaan AI dalam proyek ini berfungsi sebagai **asisten kolaboratif** yang mempercepat proses penyusunan kerangka kode (*scaffolding*) dan pencarian opsi solusi masalah. Validasi serta modifikasi mandiri secara aktif memastikan bahwa seluruh struktur logika, batasan *input*, penanganan galat (*debugging*), dan keselarasan antarmuka tetap dikontrol sepenuhnya oleh siswa.
