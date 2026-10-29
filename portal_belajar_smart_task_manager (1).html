@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal Belajar & Smart Task Manager</title>
+    
+    <!-- PWA Meta -->
+    <meta name="theme-color" content="#4f46e5">
+    <link rel="manifest" href="data:application/json,{&quot;name&quot;:&quot;Portal Belajar SMA&quot;,&quot;short_name&quot;:&quot;PortalSMA&quot;,&quot;start_url&quot;:&quot;.&quot;,&quot;display&quot;:&quot;standalone&quot;,&quot;background_color&quot;:&quot;#ffffff&quot;,&quot;theme_color&quot;:&quot;#4f46e5&quot;}">
+
+    <style>
+        /* ==========================================================================
+           1. CSS VARIABLES & THEME CONFIGURATION
+           ========================================================================== */
+        :root {
+            --bg-primary: #f8fafc;
+            --bg-card: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --border-color: #e2e8f0;
+            --sidebar-bg: #ffffff;
+            --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --transition-speed: 0.3s ease;
+            --modal-overlay: rgba(15, 23, 42, 0.6);
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #0f172a;
+            --bg-card: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --border-color: #334155;
+            --sidebar-bg: #1e293b;
+            --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+            --modal-overlay: rgba(0, 0, 0, 0.8);
+        }
+
+        /* ==========================================================================
+           2. BASE RESET & TYPOGRAPHY
+           ========================================================================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            overflow-x: hidden;
+            transition: background-color var(--transition-speed), color var(--transition-speed);
+        }
+
+        /* ==========================================================================
+           3. LAYOUT STRUCTURE
+           ========================================================================== */
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 260px;
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: fixed;
+            height: 100vh;
+            z-index: 100;
+            transition: transform var(--transition-speed), background-color var(--transition-speed);
+        }
+
+        .sidebar-header {
+            padding: 24px 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.15rem;
+            color: var(--primary);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .badge-role {
+            font-size: 0.75rem;
+            background-color: rgba(79, 70, 229, 0.15);
+            color: var(--primary);
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-weight: 600;
+            margin-top: 6px;
+            display: inline-block;
+        }
+
+        .sidebar-nav {
+            padding: 20px 12px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            padding: 12px 16px;
+            background: transparent;
+            border: none;
+            border-radius: 8px;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s ease;
+        }
+
+        .nav-item:hover {
+            background-color: rgba(148, 163, 184, 0.1);
+            color: var(--text-main);
+        }
+
+        .nav-item.active {
+            background-color: var(--primary);
+            color: #ffffff;
+            font-weight: 600;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .sidebar-footer {
+            padding: 16px 20px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .theme-toggle-btn {
+            width: 100%;
+            padding: 10px;
+            background: rgba(148, 163, 184, 0.1);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: background 0.2s;
+        }
+
+        .theme-toggle-btn:hover {
+            background: rgba(148, 163, 184, 0.2);
+        }
+
+        /* MAIN CONTENT AREA */
+        .main-content {
+            margin-left: 260px;
+            flex-grow: 1;
+            padding: 30px;
+            transition: margin-left var(--transition-speed);
+            max-width: calc(100vw - 260px);
+        }
+
+        /* TOP HEADER BAR */
+        .top-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            background: var(--bg-card);
+            padding: 16px 24px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .header-left h1 {
+            font-size: 1.35rem;
+            font-weight: 700;
+        }
+
+        .sidebar-toggle-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-main);
+        }
+
+        .streak-badge {
+            background: #fff7ed;
+            color: #c2410c;
+            border: 1px solid #ffedd5;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        [data-theme="dark"] .streak-badge {
+            background: #431407;
+            color: #ff8a65;
+            border-color: #7c2d12;
+        }
+
+        /* ==========================================================================
+           4. VIEW SECTIONS & ANIMATION
+           ========================================================================== */
+        .view-section {
+            display: none;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        .view-section.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .section-header {
+            margin-bottom: 24px;
+        }
+
+        .section-header h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .section-header p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        /* ==========================================================================
+           5. DASHBOARD COMPONENTS
+           ========================================================================== */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 24px;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: var(--shadow-sm);
+            transition: box-shadow 0.2s, transform 0.2s;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .card h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .card p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin-bottom: 16px;
+        }
+
+        .quick-stats-row {
+            display: flex;
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .stat-box {
+            background: rgba(148, 163, 184, 0.08);
+            border: 1px solid var(--border-color);
+            padding: 14px 16px;
+            border-radius: 10px;
+            flex: 1;
+            text-align: center;
+        }
+
+        .stat-num {
+            display: block;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .reminder-list-container {
+            max-height: 250px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding-right: 4px;
+        }
+
+        .todo-item-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            padding: 12px 14px;
+            border-radius: 8px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .todo-info h4 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .todo-info p {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        /* ==========================================================================
+           6. SUBJECTS GRID & MODAL
+           ========================================================================== */
+        .subjects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+            gap: 18px;
+        }
+
+        .subject-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 140px;
+        }
+
+        .subject-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--primary);
+        }
+
+        .subject-card .icon-box {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .subject-card h4 {
+            font-size: 1.05rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .subject-card span {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* Modal styling */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: var(--modal-overlay);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            width: 90%;
+            max-width: 600px;
+            border-radius: 14px;
+            padding: 28px;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+
+        .modal-close-btn {
+            position: absolute;
+            top: 16px;
+            right: 18px;
+            background: none;
+            border: none;
+            font-size: 1.4rem;
+            cursor: pointer;
+            color: var(--text-muted);
+        }
+
+        /* ==========================================================================
+           7. SMART TASK MANAGER & FORM
+           ========================================================================== */
+        .planner-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 1.4fr;
+            gap: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--text-main);
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            background-color: var(--bg-card);
+            color: var(--text-main);
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: var(--primary);
+        }
+
+        .task-card {
+            background: var(--bg-card);
+            border-left: 5px solid var(--primary);
+            padding: 16px;
+            margin-bottom: 12px;
+            border-radius: 8px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid var(--border-color);
+            border-right: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .task-info h3 {
+            font-size: 0.98rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .task-info p {
+            font-size: 0.83rem;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            border-radius: 6px;
+            margin-top: 6px;
+        }
+
+        .badge-tinggi { background-color: #ef4444; color: #ffffff; }
+        .badge-sedang { background-color: #f59e0b; color: #ffffff; }
+        .badge-rendah { background-color: #10b981; color: #ffffff; }
+
+        .task-actions button {
+            background-color: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.82rem;
+            transition: background 0.2s;
+        }
+
+        .task-actions button:hover {
+            background-color: rgba(239, 68, 68, 0.25);
+        }
+
+        /* ==========================================================================
+           8. QUIZ & FLASHCARD COMPONENTS
+           ========================================================================== */
+        .quiz-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 650px;
+            margin: 0 auto;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .quiz-option-btn {
+            width: 100%;
+            text-align: left;
+            padding: 12px 16px;
+            margin-top: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--bg-card);
+            color: var(--text-main);
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .quiz-option-btn:hover {
+            border-color: var(--primary);
+            background: rgba(79, 70, 229, 0.05);
+        }
+
+        /* BUTTON VARIATION UTILITIES */
+        .btn-primary {
+            background-color: var(--primary);
+            color: #ffffff;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-primary-outline {
+            background: transparent;
+            color: var(--primary);
+            border: 1px solid var(--primary);
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.2s;
+        }
+
+        .btn-primary-outline:hover {
+            background-color: rgba(79, 70, 229, 0.1);
+        }
+
+        .btn-sm {
+            background: rgba(148, 163, 184, 0.1);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-sm:hover {
+            background: rgba(148, 163, 184, 0.2);
+        }
+
+        /* ==========================================================================
+           9. RESPONSIVE DESIGN (MEDIA QUERIES)
+           ========================================================================== */
+        @media (max-width: 900px) {
+            .planner-wrapper {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 16px;
+                max-width: 100vw;
+            }
+
+            .sidebar-toggle-btn {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- APP CONTAINER -->
+    <div class="app-container">
+
+        <!-- SIDEBAR NAVIGATION -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h2>📚 Portal Belajar</h2>
+                <span class="badge-role">Pejuang SNBP/SNBT</span>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <button class="nav-item active" data-target="dashboard-view">
+                    <span class="icon">🏠</span> Dashboard
+                </button>
+                <button class="nav-item" data-target="subjects-view">
+                    <span class="icon">📖</span> 16 Mata Pelajaran
+                </button>
+                <button class="nav-item" data-target="quiz-view">
+                    <span class="icon">⚡</span> Smart Quiz & Flashcard
+                </button>
+                <button class="nav-item" data-target="planner-view">
+                    <span class="icon">📅</span> To-Do & Task Manager
+                </button>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button id="themeToggleBtn" class="theme-toggle-btn">
+                    🌙 <span class="toggle-text">Dark Mode</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT AREA -->
+        <main class="main-content">
+
+            <!-- TOP HEADER BAR -->
+            <header class="top-header">
+                <div class="header-left">
+                    <button id="sidebarToggle" class="sidebar-toggle-btn">☰</button>
+                    <h1>HAI AGIT! 👋</h1>
+                </div>
+                <div class="header-right">
+                    <div class="streak-badge" id="streakCounterWidget" title="Streak Belajar Beruntun">
+                        🔥 <span id="streakCount">1</span> Hari Streak
+                    </div>
+                </div>
+            </header>
+
+            <!-- ========================================== -->
+            <!-- VIEW 1: DASHBOARD UTAMA                    -->
+            <!-- ========================================== -->
+            <section id="dashboard-view" class="view-section active">
+                <div class="dashboard-grid">
+                    
+                    <!-- Target SNBT & Stats Card -->
+                    <div class="card">
+                        <h3>Target SNBT & Universitas Impian 🎯</h3>
+                        <p>Tetap konsisten kerjakan target harian, evaluasi soal yang sering salah, dan jaga semangat belajar!</p>
+                        <div class="quick-stats-row">
+                            <div class="stat-box">
+                                <span class="stat-num" id="dashTodoCount">0</span>
+                                <span class="stat-label">Tugas Hari Ini</span>
+                            </div>
+                            <div class="stat-box">
+                                <span class="stat-num" id="dashBookmarkCount">16</span>
+                                <span class="stat-label">Materi Siap Belajar</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Synchronized Reminder Widget -->
+                    <div class="card">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                            <h3>📅 Kalender & Reminder Tugas</h3>
+                            <button class="btn-sm" id="navToPlannerBtn">+ Kelola Tugas</button>
+                        </div>
+                        <div class="reminder-list-container" id="dashReminderList">
+                            <p style="color: var(--text-muted); font-size: 0.85rem;">Belum ada tugas tercatat.</p>
+                        </div>
+                    </div>
+
+                    <!-- Google Drive Portal Center -->
+                    <div class="card">
+                        <h3>📁 Pusat Akses Google Drive Utama</h3>
+                        <p>Navigasi cepat ke folder penyimpanan e-book, materi rangkuman, dan bank latihan soal SNBT/TKA.</p>
+                        <a href="https://drive.google.com" target="_blank" class="btn-primary-outline" id="globalDriveLink">Buka Folder Google Drive Utama ↗</a>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- ========================================== -->
+            <!-- VIEW 2: 16 MATA PELAJARAN                  -->
+            <!-- ========================================== -->
+            <section id="subjects-view" class="view-section">
+                <div class="section-header">
+                    <h2>Daftar 16 Mata Pelajaran SMA</h2>
+                    <p>Pilih mata pelajaran untuk melihat rangkuman rumus krusial, materi penting, dan akses link Google Drive spesifik.</p>
+                </div>
+                <div class="subjects-grid" id="subjectsGridContainer">
+                    <!-- Cards will be populated dynamically via JavaScript -->
+                </div>
+            </section>
+
+            <!-- ========================================== -->
+            <!-- VIEW 3: SMART QUIZ & FLASHCARD             -->
+            <!-- ========================================== -->
+            <section id="quiz-view" class="view-section">
+                <div class="section-header">
+                    <h2>⚡ Smart Quiz & Flashcard</h2>
+                    <p> Pilihlah mata pelajaran sesuai keinginanmu untuk persiapan SNBT atau Ujian Sekolah.</p>
+                </div>
+                <div class="quiz-card" id="quizContainerBox">
+                    <h3 id="quizQuestion">Memuat Kuis...</h3>
+                    <p style="margin-top: 8px;" id="quizSubtext">Pilihlah jawaban yang tepat di bawah ini:</p>
+                    <div id="quizOptionsContainer" style="margin-top: 16px;"></div>
+                    <div id="quizFeedback" style="margin-top: 16px; font-weight: 700;"></div>
+                    <button class="btn-primary" id="nextQuizBtn" style="margin-top: 16px; display: none;">Soal Berikutnya ➔</button>
+                </div>
+            </section>
+
+            <!-- ========================================== -->
+            <!-- VIEW 4: TO-DO & SMART TASK MANAGER         -->
+            <!-- ========================================== -->
+            <section id="planner-view" class="view-section">
+                <div class="section-header">
+                    <h2>📅 To-Do List & Smart Priority Manager</h2>
+                    <p>Atur tugas sekolahmu secara otomatis dengan kalkulasi skor prioritas cerdas berdasarkan deadline dan kesulitan!</p>
+                </div>
+                <div class="planner-wrapper">
+                    <!-- Form Input Tugas -->
+                    <div class="card">
+                        <h3>Tambah Tugas Baru</h3>
+                        <form id="taskForm">
+                            <div class="form-group">
+                                <label for="mapel">Mata Pelajaran:</label>
+                                <input type="text" id="mapel" required placeholder="Contoh: Matematika">
+                            </div>
+                            <div class="form-group">
+                                <label for="tugas">Deskripsi Tugas:</label>
+                                <input type="text" id="tugas" required placeholder="Contoh: PR Bab 3 Trigonometri">
+                            </div>
+                            <div class="form-group">
+                                <label for="tenggat">Tenggat Waktu (Deadline):</label>
+                                <input type="date" id="tenggat" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="kesulitan">Tingkat Kesulitan (1 - 5):</label>
+                                <input type="number" id="kesulitan" min="1" max="5" value="3" required>
+                            </div>
+                            <button type="submit" class="btn-primary" style="width: 100%;">Simpan & Analisis Tugas</button>
+                        </form>
+                    </div>
+
+                    <!-- Task List Display -->
+                    <div class="card">
+                        <h3>Daftar Tugas (Smart Priority)</h3>
+                        <div id="taskList" style="margin-top: 14px;">
+                            <!-- Task cards inserted here -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- SUBJECT DETAIL MODAL -->
+    <div class="modal-overlay" id="subjectModal">
+        <div class="modal-content">
+            <button class="modal-close-btn" id="closeModalBtn">&times;</button>
+            <h2 id="modalSubjectTitle" style="color: var(--primary); margin-bottom: 8px;">Judul Mapel</h2>
+            <p id="modalSubjectCategory" style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 16px;">Kategori</p>
+            <div id="modalSubjectBody" style="line-height: 1.6; font-size: 0.93rem; margin-bottom: 20px;">
+                <!-- Content loaded dynamically -->
+            </div>
+            <a href="#" target="_blank" class="btn-primary" id="modalDriveBtn">Buka Google Drive Mapel Ini ↗</a>
+        </div>
+    </div>
+
+    <!-- MAIN APP JAVASCRIPT LOGIC -->
+    <script>
+        /* ==========================================================================
+           1. DATA STRUCTURES & SUBJECTS LIST
+           ========================================================================== */
+        const subjectsData = [
+            { id: "mat-wajib", name: "Matematika Wajib", icon: "📐", category: "Umum", summary: "Fungsi, Persamaan Kuadrat, Trigonometri Dasar, Matriks, dan Statistika.", drive: "https://drive.google.com" },
+            { id: "mat-lanjut", name: "Matematika Lanjut", icon: "📊", category: "Peminatan", summary: "Vektor, Polinomial, Suku Banyak, Limit Fungsi Trigono, Kalkulus Lanjut.", drive: "https://drive.google.com" },
+            { id: "fisika", name: "Fisika", icon: "⚡", category: "MIPA", summary: "Mekanika Newton, Termodinamika, Gelombang Elektromagnetik, Listrik Magnet.", drive: "https://drive.google.com" },
+            { id: "kimia", name: "Kimia", icon: "🧪", category: "MIPA", summary: "Struktur Atom, Ikatan Kimia, Stoikiometri, Laju Reaksi, Asam Basa, Termokimia.", drive: "https://drive.google.com" },
+            { id: "biologi", name: "Biologi", icon: "🧬", category: "MIPA", summary: "Sel, Genetika, Metabolisme, Sistem Organ Manusia, Ekologi, Evolusi.", drive: "https://drive.google.com" },
+            { id: "ekonomi", name: "Ekonomi", icon: "📈", category: "IPS", summary: "Kelangkaan, Mekanisme Pasar, Akuntansi Dasar, Kebijakan Moneter & Fiskal.", drive: "https://drive.google.com" },
+            { id: "sosiologi", name: "Sosiologi", icon: "👥", category: "IPS", summary: "Interaksi Sosial, Konflik Sosial, Globalisasi, Penelitian Sosial.", drive: "https://drive.google.com" },
+            { id: "geografi", name: "Geografi", icon: "🌍", category: "IPS", summary: "Peta & Inderaja, Vulkanisme, Iklim, Pembangunan Wilayah, Penginderaan Jauh.", drive: "https://drive.google.com" },
+            { id: "sej-wajib", name: "Sejarah Wajib", icon: "🏛️", category: "Umum", summary: "Sejarah Pergerakan Nasional, Proklamasi, Era Orde Baru & Reformasi.", drive: "https://drive.google.com" },
+            { id: "sej-lanjut", name: "Sejarah Lanjut", icon: "📜", category: "Peminatan", summary: "Peradaban Dunia Kuno, Perang Dunia I & II, Perang Dingin.", drive: "https://drive.google.com" },
+            { id: "indo", name: "Bahasa Indonesia", icon: "🇮🇩", category: "Umum", summary: "Teks Laporan Hasil Observasi, Teks Eksplanasi, Paragraf Argumentatif, EYD V.", drive: "https://drive.google.com" },
+            { id: "inggris", name: "Bahasa Inggris", icon: "🇬🇧", category: "Umum", summary: "Reading Comprehension, Main Idea, Tenses, Passive Voice, Narrative Text.", drive: "https://drive.google.com" },
+            { id: "ing-lanjut", name: "Bahasa Inggris Lanjut", icon: "🗣️", category: "Peminatan", summary: "Advanced Essay Writing, TOEFL Preparation, Analytical Exposition.", drive: "https://drive.google.com" },
+            { id: "informatika", name: "Informatika", icon: "💻", category: "MIPA", summary: "Algoritma Pemrograman, Analisis Data, Jaringan Komputer, Biner & Gerbang Logika.", drive: "https://drive.google.com" },
+            { id: "ppkn", name: "PPKn", icon: "🦅", category: "Umum", summary: "Pancasila, UUD 1945, Hak & Kewajiban Warga Negara, Wawasan Nusantara.", drive: "https://drive.google.com" },
+            { id: "pai", name: "PAI / Agama", icon: "📖", category: "Umum", summary: "Akhlak, Fiqih, Sejarah Kebudayaan Islam, Al-Qur'an dan Hadis.", drive: "https://drive.google.com" }
+        ];
+
+        /* ==========================================================================
+           2. NAVIGATION & THEME SWITCHING
+           ========================================================================== */
+        const navItems = document.querySelectorAll('.nav-item');
+        const viewSections = document.querySelectorAll('.view-section');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const themeToggleBtn = document.getElementById('themeToggleBtn');
+
+        // Page Navigation Logic
+        function switchView(targetId) {
+            navItems.forEach(item => {
+                if (item.getAttribute('data-target') === targetId) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+
+            viewSections.forEach(section => {
+                if (section.id === targetId) {
+                    section.classList.add('active');
+                } else {
+                    section.classList.remove('active');
+                }
+            });
+
+            if (window.innerWidth <= 768) {
+                sidebar.classList.remove('open');
+            }
+        }
+
+        navItems.forEach(item => {
+            item.addEventListener('click', () => {
+                switchView(item.getAttribute('data-target'));
+            });
+        });
+
+        document.getElementById('navToPlannerBtn').addEventListener('click', () => {
+            switchView('planner-view');
+        });
+
+        // Mobile Sidebar Toggle
+        sidebarToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('open');
+        });
+
+        // Dark / Light Mode Toggle
+        let currentTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', currentTheme);
+        updateThemeBtnText();
+
+        themeToggleBtn.addEventListener('click', () => {
+            currentTheme = currentTheme === 'light' ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', currentTheme);
+            localStorage.setItem('theme', currentTheme);
+            updateThemeBtnText();
+        });
+
+        function updateThemeBtnText() {
+            themeToggleBtn.querySelector('.toggle-text').textContent = currentTheme === 'light' ? 'Dark Mode' : 'Light Mode';
+        }
+
+        /* ==========================================================================
+           3. SMART TASK MANAGER & PRIORITY ALGORITHM
+           ========================================================================== */
+        let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+
+        // Calculate Priority Score Based on Deadline and Difficulty
+        function calculatePriority(deadlineStr, difficulty) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const deadline = new Date(deadlineStr);
+            
+            const diffTime = deadline - today;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            if (diffDays < 0) {
+                return { score: 999, label: "TERLAMBAT 🚨", classBadge: "badge-tinggi", days: diffDays };
+            }
+            
+            // Priority Score Formula
+            const weightTime = Math.max(1, 10 - diffDays);
+            const score = (difficulty * 2) + weightTime;
+            
+            if (score >= 12 || diffDays <= 1) {
+                return { score: score, label: "TINGGI (Mendesak) 🔥", classBadge: "badge-tinggi", days: diffDays };
+            } else if (score >= 7) {
+                return { score: score, label: "SEDANG (Jangan Lupa) ⚠️", classBadge: "badge-sedang", days: diffDays };
+            } else {
+                return { score: score, label: "RENDAH (Chill) ☕", classBadge: "badge-rendah", days: diffDays };
+            }
+        }
+
+        // Render Tasks and Sync with Dashboard
+        function renderTasks() {
+            const taskListContainer = document.getElementById('taskList');
+            const dashReminderList = document.getElementById('dashReminderList');
+            const dashTodoCount = document.getElementById('dashTodoCount');
+
+            taskListContainer.innerHTML = '';
+            
+            if (tasks.length === 0) {
+                taskListContainer.innerHTML = '<p style="text-align: center; color: var(--text-muted); padding: 20px;">Belum ada tugas tercatat. Kerja bagus!</p>';
+                dashReminderList.innerHTML = '<p style="color: var(--text-muted); font-size: 0.85rem;">Belum ada tugas tercatat.</p>';
+                dashTodoCount.textContent = '0';
+                return;
+            }
+
+            // Auto-sort from highest to lowest priority
+            tasks.sort((a, b) => {
+                let pA = calculatePriority(a.tenggat, a.kesulitan).score;
+                let pB = calculatePriority(b.tenggat, b.kesulitan).score;
+                return pB - pA;
+            });
+
+            dashTodoCount.textContent = tasks.length;
+
+            // Render Dashboard Reminder Widget
+            dashReminderList.innerHTML = '';
+            tasks.slice(0, 4).forEach(task => {
+                const pInfo = calculatePriority(task.tenggat, task.kesulitan);
+                const reminderCard = document.createElement('div');
+                reminderCard.className = 'todo-item-card';
+                reminderCard.innerHTML = `
+                    <div class="todo-info">
+                        <h4>📖 ${task.mapel} - ${task.tugas}</h4>
+                        <p>📅 ${task.tenggat} (${pInfo.days < 0 ? 'Terlewat' : pInfo.days + ' hari lagi'})</p>
+                    </div>
+                    <span class="badge ${pInfo.classBadge}">${pInfo.label.split(' ')[0]}</span>
+                `;
+                dashReminderList.appendChild(reminderCard);
+            });
+
+            // Render Full Planner Task List
+            tasks.forEach((task, index) => {
+                const priorityInfo = calculatePriority(task.tenggat, task.kesulitan);
+                
+                const taskCard = document.createElement('div');
+                taskCard.className = 'task-card';
+                taskCard.innerHTML = `
+                    <div class="task-info">
+                        <h3>📖 ${task.mapel} - ${task.tugas}</h3>
+                        <p>📅 Deadline: ${task.tenggat} (${priorityInfo.days < 0 ? 'Terlewat ' + Math.abs(priorityInfo.days) + ' hari' : priorityInfo.days + ' hari lagi'})</p>
+                        <p>⚡ Kesulitan: ${task.kesulitan}/5</p>
+                        <span class="badge ${priorityInfo.classBadge}">Prioritas: ${priorityInfo.label}</span>
+                    </div>
+                    <div class="task-actions">
+                        <button onclick="deleteTask(${index})">Hapus</button>
+                    </div>
+                `;
+                taskListContainer.appendChild(taskCard);
+            });
+        }
+
+        // Add New Task Event Listener
+        document.getElementById('taskForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const mapel = document.getElementById('mapel').value;
+            const tugas = document.getElementById('tugas').value;
+            const tenggat = document.getElementById('tenggat').value;
+            const kesulitan = parseInt(document.getElementById('kesulitan').value);
+            
+            tasks.push({ mapel, tugas, tenggat, kesulitan });
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+            
+            renderTasks();
+            this.reset();
+        });
+
+        // Delete Task Function
+        window.deleteTask = function(index) {
+            tasks.splice(index, 1);
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+            renderTasks();
+        };
+
+        /* ==========================================================================
+           4. SUBJECTS RENDER & MODAL HANDLER
+           ========================================================================== */
+        const subjectsGridContainer = document.getElementById('subjectsGridContainer');
+        const subjectModal = document.getElementById('subjectModal');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+
+        function renderSubjects() {
+            subjectsGridContainer.innerHTML = '';
+            subjectsData.forEach(subject => {
+                const card = document.createElement('div');
+                card.className = 'subject-card';
+                card.innerHTML = `
+                    <div>
+                        <div class="icon-box">${subject.icon}</div>
+                        <h4>${subject.name}</h4>
+                        <span>Kategori: ${subject.category}</span>
+                    </div>
+                    <button class="btn-sm" style="margin-top: 14px; width: 100%;">Lihat Detail ➔</button>
+                `;
+                card.addEventListener('click', () => openSubjectModal(subject));
+                subjectsGridContainer.appendChild(card);
+            });
+        }
+
+        function openSubjectModal(subject) {
+            document.getElementById('modalSubjectTitle').textContent = `${subject.icon} ${subject.name}`;
+            document.getElementById('modalSubjectCategory').textContent = `Kategori Mata Pelajaran: ${subject.category}`;
+            document.getElementById('modalSubjectBody').innerHTML = `
+                <h4 style="margin-bottom: 6px; font-weight: 600;">Ringkasan & Rumus Utama:</h4>
+                <p style="color: var(--text-muted);">${subject.summary}</p>
+            `;
+            document.getElementById('modalDriveBtn').href = subject.drive;
+            subjectModal.classList.add('active');
+        }
+
+        closeModalBtn.addEventListener('click', () => {
+            subjectModal.classList.remove('active');
+        });
+
+        subjectModal.addEventListener('click', (e) => {
+            if (e.target === subjectModal) {
+                subjectModal.classList.remove('active');
+            }
+        });
+
+        /* ==========================================================================
+           5. SMART QUIZ GENERATOR
+           ========================================================================== */
+        let currentQuizAnswer = null;
+
+        function generateMathQuiz() {
+            const numA = Math.floor(Math.random() * 12) + 3;
+            const numB = Math.floor(Math.random() * 12) + 2;
+            const operators = ['+', '-', '*'];
+            const op = operators[Math.floor(Math.random() * operators.length)];
+            
+            let answer = 0;
+            if (op === '+') answer = numA + numB;
+            if (op === '-') answer = numA - numB;
+            if (op === '*') answer = numA * numB;
+
+            currentQuizAnswer = answer;
+
+            document.getElementById('quizQuestion').textContent = `Berapakah hasil dari ${numA} ${op} ${numB}?`;
+            document.getElementById('quizFeedback').textContent = '';
+            document.getElementById('nextQuizBtn').style.display = 'none';
+
+            // Generate Options
+            const options = [answer, answer + 2, answer - 3, answer + 5];
+            options.sort(() => Math.random() - 0.5);
+
+            const optionsContainer = document.getElementById('quizOptionsContainer');
+            optionsContainer.innerHTML = '';
+
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'quiz-option-btn';
+                btn.textContent = `Jawaban: ${opt}`;
+                btn.onclick = () => checkQuizAnswer(opt);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function checkQuizAnswer(selected) {
+            const feedback = document.getElementById('quizFeedback');
+            if (selected === currentQuizAnswer) {
+                feedback.textContent = "🎉 Benar sekali! Jawabanmu tepat.";
+                feedback.style.color = "#10b981";
+            } else {
+                feedback.textContent = `❌ Kurang tepat. Jawaban yang benar adalah ${currentQuizAnswer}.`;
+                feedback.style.color = "#ef4444";
+            }
+            document.getElementById('nextQuizBtn').style.display = 'inline-block';
+        }
+
+        document.getElementById('nextQuizBtn').addEventListener('click', generateMathQuiz);
+
+        /* ==========================================================================
+           6. INITIALIZATION & INLINE SERVICE WORKER
+           ========================================================================== */
+        window.addEventListener('DOMContentLoaded', () => {
+            renderTasks();
+            renderSubjects();
+            generateMathQuiz();
+        });
+
+        // Service Worker Registration for PWA Readiness
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                const swBlob = new Blob([`
+                    const CACHE_NAME = 'portal-sma-v1';
+                    self.addEventListener('install', e => e.waitUntil(caches.open(CACHE_NAME)));
+                    self.addEventListener('fetch', e => e.respondWith(fetch(e.request).catch(() => caches.match(e.request))));
+                `], { type: 'text/javascript' });
+                
+                const blobUrl = URL.createObjectURL(swBlob);
+                navigator.serviceWorker.register(blobUrl)
+                    .then(() => console.log('PWA Service Worker Active'))
+                    .catch(err => console.log('SW Error:', err));
+            });
+        }
+    </script>
+</body>
+</html>
